@@ -176,7 +176,7 @@ export default function FarmerDashboard({ account, user }) {
 
             const transaction = await contract.registerProduct(
                 formData.productName,
-                user?.fullName || 'Farmer',
+                user?.fullName || 'Producer',
                 formData.farmLocation,
                 harvestDateTimestamp
             )
@@ -204,7 +204,7 @@ export default function FarmerDashboard({ account, user }) {
                 productName: formData.productName,
                 productType: formData.productType,
                 batchNumber: formData.batchNumber,
-                farmerName: user?.fullName || 'Farmer',
+                farmerName: user?.fullName || 'Producer',
                 farmLocation: formData.farmLocation,
                 harvestDate: formData.harvestDate,
                 farmerAddress: account,
@@ -222,7 +222,7 @@ export default function FarmerDashboard({ account, user }) {
                 batchNumber: formData.batchNumber,
                 farmLocation: formData.farmLocation,
                 harvestDate: formData.harvestDate,
-                farmerName: user?.fullName || 'Farmer',
+                farmerName: user?.fullName || 'Producer',
                 weightKg: formData.weightKg ? Number(formData.weightKg) : null,
                 weightType: formData.weightType,
                 mediaAssets,

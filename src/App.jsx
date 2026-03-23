@@ -1,4 +1,6 @@
 import { Suspense, lazy, useState, useEffect } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faLinkedinIn, faInstagram, faFacebookF, faXTwitter } from '@fortawesome/free-brands-svg-icons'
 import './App.css'
 import './styles/Register.css'
 import './styles/Login.css'
@@ -23,18 +25,16 @@ const ROLE_CONFIG = {
         navItems: [
             { key: 'home', label: 'Home' },
             { key: 'consumer', label: 'Consumer Dashboard' },
-            { key: 'verify', label: 'Verify Product' },
-            { key: 'profile', label: 'Profile' }
+            { key: 'verify', label: 'Verify Product' }
         ]
     },
     farmer: {
-        label: 'Farmer / Producer',
+        label: 'Producer',
         homePage: 'home',
         navItems: [
             { key: 'home', label: 'Home' },
-            { key: 'farmer', label: 'Farmer Dashboard' },
-            { key: 'verify', label: 'Verify Product' },
-            { key: 'profile', label: 'Profile' }
+            { key: 'farmer', label: 'Producer Dashboard' },
+            { key: 'verify', label: 'Verify Product' }
         ]
     },
     distributor: {
@@ -43,8 +43,7 @@ const ROLE_CONFIG = {
         navItems: [
             { key: 'home', label: 'Home' },
             { key: 'distributor', label: 'Distributor Dashboard' },
-            { key: 'verify', label: 'Verify Product' },
-            { key: 'profile', label: 'Profile' }
+            { key: 'verify', label: 'Verify Product' }
         ]
     },
     analyst: {
@@ -53,8 +52,7 @@ const ROLE_CONFIG = {
         navItems: [
             { key: 'home', label: 'Home' },
             { key: 'analytics', label: 'Analytics Dashboard' },
-            { key: 'verify', label: 'Verify Product' },
-            { key: 'profile', label: 'Profile' }
+            { key: 'verify', label: 'Verify Product' }
         ]
     },
     regulator: {
@@ -63,8 +61,7 @@ const ROLE_CONFIG = {
         navItems: [
             { key: 'home', label: 'Home' },
             { key: 'regulator', label: 'Regulator View' },
-            { key: 'verify', label: 'Verify Product' },
-            { key: 'profile', label: 'Profile' }
+            { key: 'verify', label: 'Verify Product' }
         ]
     },
     admin: {
@@ -73,8 +70,7 @@ const ROLE_CONFIG = {
         navItems: [
             { key: 'home', label: 'Home' },
             { key: 'regulator', label: 'Admin Dashboard' },
-            { key: 'verify', label: 'Verify Product' },
-            { key: 'profile', label: 'Profile' }
+            { key: 'verify', label: 'Verify Product' }
         ]
     },
     supplier: {
@@ -83,8 +79,7 @@ const ROLE_CONFIG = {
         navItems: [
             { key: 'home', label: 'Home' },
             { key: 'distributor', label: 'Supplier Dashboard' },
-            { key: 'verify', label: 'Verify Product' },
-            { key: 'profile', label: 'Profile' }
+            { key: 'verify', label: 'Verify Product' }
         ]
     },
     inspector: {
@@ -93,8 +88,7 @@ const ROLE_CONFIG = {
         navItems: [
             { key: 'home', label: 'Home' },
             { key: 'regulator', label: 'Inspection Console' },
-            { key: 'verify', label: 'Verify Product' },
-            { key: 'profile', label: 'Profile' }
+            { key: 'verify', label: 'Verify Product' }
         ]
     }
 }
@@ -240,7 +234,7 @@ function App() {
 
         switch (currentPage) {
             case 'home':
-                return <HomePage onNavigateToVerify={() => setCurrentPage('verify')} onNavigateToContact={() => setCurrentPage('home')} />
+                return <HomePage onNavigateToVerify={() => setCurrentPage('verify')} />
             case 'consumer':
                 return <ConsumerDashboard onNavigateToVerify={() => setCurrentPage('verify')} />
             case 'verify':
@@ -267,7 +261,7 @@ function App() {
                     />
                 )
             default:
-                return <HomePage onNavigateToVerify={() => setCurrentPage('verify')} onNavigateToContact={() => setCurrentPage('home')} />
+                return <HomePage onNavigateToVerify={() => setCurrentPage('verify')} />
         }
     }
 
@@ -347,6 +341,20 @@ function App() {
                                     Farm2User connects farms, distributors, regulators, and consumers
                                     with transparent product traceability and verifiable lifecycle data.
                                 </p>
+                                <div className="footer-social-links" aria-label="Farm2User social links">
+                                    <a className="footer-social-link" href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn">
+                                        <FontAwesomeIcon icon={faLinkedinIn} />
+                                    </a>
+                                    <a className="footer-social-link" href="https://www.instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">
+                                        <FontAwesomeIcon icon={faInstagram} />
+                                    </a>
+                                    <a className="footer-social-link" href="https://www.facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
+                                        <FontAwesomeIcon icon={faFacebookF} />
+                                    </a>
+                                    <a className="footer-social-link" href="https://x.com" target="_blank" rel="noreferrer" aria-label="Twitter">
+                                        <FontAwesomeIcon icon={faXTwitter} />
+                                    </a>
+                                </div>
                             </div>
 
                             <div>

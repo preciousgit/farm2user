@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-    faUser,
+    faLeaf,
+    faUserLarge,
     faCog,
     faBell,
+    faCircleCheck,
     faArrowRightFromBracket,
     faWallet,
     faRepeat,
@@ -18,6 +20,7 @@ export default function Navbar({ currentPage, setCurrentPage, navItems, account,
     return (
         <nav className="navbar">
             <div className="navbar-logo">
+                <FontAwesomeIcon icon={faLeaf} className="navbar-brand-icon" />
                 Farm2User
             </div>
 
@@ -28,6 +31,7 @@ export default function Navbar({ currentPage, setCurrentPage, navItems, account,
                         className={currentPage === navItem.key ? 'active' : ''}
                         onClick={() => setCurrentPage(navItem.key)}
                     >
+                        {navItem.key === 'verify' && <FontAwesomeIcon icon={faCircleCheck} className="verify-nav-icon" />}
                         {navItem.label}
                     </button>
                 ))}
@@ -41,7 +45,7 @@ export default function Navbar({ currentPage, setCurrentPage, navItems, account,
                             onClick={() => setShowUserDropdown(!showUserDropdown)}
                             title="User Profile"
                         >
-                            <FontAwesomeIcon icon={faUser} />
+                            <FontAwesomeIcon icon={faUserLarge} />
                         </button>
 
                         {showUserDropdown && (
@@ -56,7 +60,7 @@ export default function Navbar({ currentPage, setCurrentPage, navItems, account,
                                         setShowUserDropdown(false)
                                         onOpenProfileTab?.('profile')
                                     }}>
-                                        <FontAwesomeIcon icon={faUser} /> Profile
+                                        <FontAwesomeIcon icon={faUserLarge} /> Profile
                                     </button>
                                     <button className="user-dropdown-item" onClick={() => {
                                         setShowUserDropdown(false)

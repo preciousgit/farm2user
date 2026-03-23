@@ -1,13 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import apiService from '../services/apiService'
 
-const partnerList = [
-    'AgriTrust Cooperative',
-    'GreenChain Logistics',
-    'National Food Safety Board',
-    'FreshRoute Distributors',
-    'SafeHarvest Initiative',
-    'AgroData Exchange'
+const partnerLogos = [
+    { name: 'Tesco', logoUrl: 'https://cdn.simpleicons.org/tesco/00539f' },
+    { name: 'ASDA', logoUrl: 'https://cdn.simpleicons.org/asda/68a51c' },
+    { name: 'Morrisons', logoUrl: 'https://cdn.simpleicons.org/morrisons/00793b' },
+    { name: 'KFC', logoUrl: 'https://cdn.simpleicons.org/kfc/f40027' },
+    { name: 'Coca-Cola', logoUrl: 'https://cdn.simpleicons.org/cocacola/f40009' },
+    { name: "McDonald's", logoUrl: 'https://cdn.simpleicons.org/mcdonalds/ffc72c' }
 ]
 
 const blogPosts = [
@@ -28,29 +28,56 @@ const blogPosts = [
     }
 ]
 
+const defaultCryptoRows = [
+    { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', value: 68771.3, change24h: -2.61 },
+    { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', value: 2079.53, change24h: -3.36 },
+    { id: 'ripple', name: 'XRP', symbol: 'XRP', value: 1.4, change24h: -2.47 },
+    { id: 'solana', name: 'Solana', symbol: 'SOL', value: 87.36, change24h: -2.56 },
+    { id: 'cardano', name: 'Cardano', symbol: 'ADA', value: 0.72, change24h: -1.88 }
+]
+
 const testimonials = [
     {
         quote: 'Farm2User helped us prove authenticity for each batch in under 20 seconds.',
         name: 'Ngozi A.',
-        role: 'Quality Manager, FreshRoute'
+        role: 'Quality Manager, FreshRoute',
+        avatar: 'https://i.pravatar.cc/96?img=47'
     },
     {
         quote: 'The compliance dashboard made audits faster and more evidence-based.',
         name: 'Hassan B.',
-        role: 'Regulatory Inspector'
+        role: 'Regulatory Inspector',
+        avatar: 'https://i.pravatar.cc/96?img=13'
     },
     {
         quote: 'Customers trust us more because they can verify product history instantly.',
         name: 'Dara E.',
-        role: 'Retail Operations Lead'
+        role: 'Retail Operations Lead',
+        avatar: 'https://i.pravatar.cc/96?img=31'
+    },
+    {
+        quote: 'Our farmers now close partnerships faster because buyers can trace every batch with confidence.',
+        name: 'Amaka O.',
+        role: 'Farm Operations Lead',
+        avatar: 'https://i.pravatar.cc/96?img=44'
+    },
+    {
+        quote: 'We reduced verification back-and-forth by over 60% with a single transparent product timeline.',
+        name: 'Daniel K.',
+        role: 'Compliance Analyst',
+        avatar: 'https://i.pravatar.cc/96?img=66'
     }
 ]
 
-export default function HomePage({ onNavigateToVerify, onNavigateToContact }) {
+export default function HomePage({ onNavigateToVerify }) {
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(false)
-    const [activityIndex, setActivityIndex] = useState(0)
     const [testimonialIndex, setTestimonialIndex] = useState(0)
+    const [cryptoRows, setCryptoRows] = useState(defaultCryptoRows)
+    const [cryptoLoading, setCryptoLoading] = useState(true)
+    const [cryptoUpdatedAt, setCryptoUpdatedAt] = useState(null)
+    const [cryptoPulseById, setCryptoPulseById] = useState({})
+    const pulseTimeoutsRef = useRef({})
 
     useEffect(() => {
         const loadProducts = async () => {
@@ -68,39 +95,123 @@ export default function HomePage({ onNavigateToVerify, onNavigateToContact }) {
         loadProducts()
     }, [])
 
-    const activityItems = useMemo(() => {
-        if (!products.length) {
-            return ['No recent transactions yet. Register products to populate live activity.']
-        }
-
-        const entries = []
-        products.slice(0, 20).forEach((product) => {
-            entries.push(
-                `Product #${product.productId} (${product.productName}) is currently at ${product.currentStage || 'Unknown Stage'}.`
-            )
-            const updates = Array.isArray(product.stakeholderUpdates) ? product.stakeholderUpdates : []
-            updates.slice(-2).forEach((update) => {
-                entries.push(
-                    `${update.actorRole || 'Stakeholder'} ${update.actorName || 'Unknown'}: ${update.action || 'Updated'} for Product #${product.productId}.`
-                )
-            })
-        })
-        return entries.slice(0, 30)
-    }, [products])
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setActivityIndex((current) => (current + 1) % activityItems.length)
-        }, 2800)
-        return () => clearInterval(interval)
-    }, [activityItems.length])
-
     useEffect(() => {
         const interval = setInterval(() => {
             setTestimonialIndex((current) => (current + 1) % testimonials.length)
-        }, 4500)
+        }, 2500)
+
         return () => clearInterval(interval)
     }, [])
+
+    useEffect(() => {
+        let mounted = true
+
+        const fetchCrypto = async () => {
+            try {
+                const response = await fetch(
+                    'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,ripple,solana,cardano&vs_currencies=usd&include_24hr_change=true',
+                    {
+                        headers: {
+                            accept: 'application/json'
+                        }
+                    }
+                )
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch prices: ${response.status}`)
+                }
+
+                const data = await response.json()
+                const nextRows = defaultCryptoRows.map((row) => {
+                    const live = data[row.id] || {}
+                    return {
+                        ...row,
+                        value: Number.isFinite(live.usd) ? live.usd : row.value,
+                        change24h: Number.isFinite(live.usd_24h_change) ? live.usd_24h_change : row.change24h
+                    }
+                })
+
+                if (mounted) {
+                    setCryptoRows((previousRows) => {
+                        const previousById = new Map(previousRows.map((row) => [row.id, row]))
+                        const pulses = {}
+
+                        nextRows.forEach((row) => {
+                            const previous = previousById.get(row.id)
+                            if (!previous || previous.value === row.value) {
+                                return
+                            }
+
+                            pulses[row.id] = row.value > previous.value ? 'up' : 'down'
+                        })
+
+                        if (Object.keys(pulses).length > 0) {
+                            setCryptoPulseById((current) => ({ ...current, ...pulses }))
+
+                            Object.keys(pulses).forEach((id) => {
+                                clearTimeout(pulseTimeoutsRef.current[id])
+                                pulseTimeoutsRef.current[id] = setTimeout(() => {
+                                    if (!mounted) {
+                                        return
+                                    }
+
+                                    setCryptoPulseById((current) => {
+                                        if (!current[id]) {
+                                            return current
+                                        }
+
+                                        const next = { ...current }
+                                        delete next[id]
+                                        return next
+                                    })
+                                }, 900)
+                            })
+                        }
+
+                        return nextRows
+                    })
+                    setCryptoUpdatedAt(new Date())
+                }
+            } catch {
+                if (mounted) {
+                    setCryptoRows(defaultCryptoRows)
+                }
+            } finally {
+                if (mounted) {
+                    setCryptoLoading(false)
+                }
+            }
+        }
+
+        fetchCrypto()
+        const timer = setInterval(fetchCrypto, 30000)
+
+        return () => {
+            mounted = false
+            clearInterval(timer)
+            Object.values(pulseTimeoutsRef.current).forEach((timeoutId) => clearTimeout(timeoutId))
+        }
+    }, [])
+
+    const featuredPost = blogPosts[0]
+    const latestPosts = blogPosts.slice(1)
+
+    const formatUsd = (value) => {
+        const normalized = Number.isFinite(value) ? value : 0
+        if (normalized >= 1000) {
+            return `$${normalized.toLocaleString(undefined, { maximumFractionDigits: 2 })}`
+        }
+        if (normalized >= 1) {
+            return `$${normalized.toFixed(2)}`
+        }
+        return `$${normalized.toFixed(4)}`
+    }
+
+    const formatChange = (value) => {
+        const normalized = Number.isFinite(value) ? value : 0
+        const sign = normalized >= 0 ? '+' : ''
+        return `${sign}${normalized.toFixed(2)}%`
+    }
 
     return (
         <div>
@@ -114,7 +225,6 @@ export default function HomePage({ onNavigateToVerify, onNavigateToContact }) {
                     </p>
                     <div className="home-hero-actions">
                         <button className="btn btn-primary" type="button" onClick={onNavigateToVerify}>Verify Product</button>
-                        <button className="btn btn-secondary" type="button" onClick={onNavigateToContact}>Contact Us</button>
                     </div>
                 </div>
                 <div className="home-hero-metrics">
@@ -128,82 +238,111 @@ export default function HomePage({ onNavigateToVerify, onNavigateToContact }) {
                     </div>
                     <div className="stat-card">
                         <div className="label">Stakeholders</div>
-                        <div className="value" style={{ fontSize: '1.2rem' }}>Farmers • Distributors • Regulators • Consumers</div>
+                        <div className="value" style={{ fontSize: '1.2rem' }}>Producers • Distributors • Regulators • Consumers</div>
                     </div>
+                </div>
+            </section>
+
+            <section className="card news-hub-card">
+                <div className="news-hub-header">
+                    <div>
+                        <h3>Market & News Hub</h3>
+                        <p>Live crypto prices and featured stories from the Farm2User ecosystem.</p>
+                    </div>
+                    <span className="news-hub-live-badge">{cryptoLoading ? 'Syncing...' : 'Live updates'}</span>
+                </div>
+
+                <div className="crypto-strip" aria-label="Top five cryptocurrency values">
+                    {cryptoRows.map((coin) => {
+                        const isNegative = coin.change24h < 0
+                        const pulseState = cryptoPulseById[coin.id]
+                        return (
+                            <article key={coin.id} className={`crypto-tile${pulseState ? ` crypto-tile-${pulseState}` : ''}`}>
+                                <p className="crypto-name">{coin.name}</p>
+                                <p className="crypto-value">{formatUsd(coin.value)}</p>
+                                <p className={`crypto-change ${isNegative ? 'negative' : 'positive'}`}>
+                                    {formatChange(coin.change24h)}
+                                </p>
+                            </article>
+                        )
+                    })}
+                </div>
+
+                <div className="news-desk-grid">
+                    <article className="news-feature-card">
+                        <p className="news-meta">Featured Story • {featuredPost.date}</p>
+                        <h4>{featuredPost.title}</h4>
+                        <p>{featuredPost.summary}</p>
+                        <button type="button" className="btn btn-secondary news-read-btn">Read story</button>
+                    </article>
+
+                    <aside className="news-feed-list">
+                        <p className="news-feed-title">Latest Updates</p>
+                        {latestPosts.map((post) => (
+                            <article key={post.title} className="news-feed-item">
+                                <p className="news-meta">{post.date}</p>
+                                <h5>{post.title}</h5>
+                                <p>{post.summary}</p>
+                            </article>
+                        ))}
+                        <p className="news-refresh-time">
+                            {cryptoUpdatedAt ? `Prices refreshed at ${cryptoUpdatedAt.toLocaleTimeString()}` : 'Waiting for first market sync...'}
+                        </p>
+                    </aside>
                 </div>
             </section>
 
             <section className="card">
                 <div className="card-header">
-                    <h3 style={{ margin: 0 }}>Live Transaction Activity</h3>
-                    <p>Recent actions from stakeholders across the supply chain.</p>
+                    <p style={{ margin: 0, textAlign: 'center' }}>Organizations integrating traceability and food safety with Farm2User.</p>
                 </div>
-                <div className="activity-ticker">
-                    <span>{activityItems[activityIndex]}</span>
-                </div>
-            </section>
-
-            <section className="card">
-                <div className="card-header">
-                    <h3 style={{ margin: 0 }}>Our Partners</h3>
-                    <p>Organizations integrating traceability and food safety with Farm2User.</p>
-                </div>
-                <div className="partners-grid">
-                    {partnerList.map((partner) => (
-                        <div key={partner} className="partner-pill">{partner}</div>
-                    ))}
-                </div>
-            </section>
-
-            <section className="grid grid-2">
-                <div className="card">
-                    <div className="card-header">
-                        <h3 style={{ margin: 0 }}>Contact Us</h3>
-                    </div>
-                    <div className="home-contact">
-                        <p>Email: support@farm2user.io</p>
-                        <p>Partnerships: partners@farm2user.io</p>
-                        <p>Compliance Desk: compliance@farm2user.io</p>
-                    </div>
-                </div>
-
-                <div className="card">
-                    <div className="card-header">
-                        <h3 style={{ margin: 0 }}>Newsletter Signup</h3>
-                    </div>
-                    <div className="newsletter-row">
-                        <input type="email" placeholder="Enter your email for updates" />
-                        <button className="btn btn-primary" type="button">Subscribe</button>
+                <div className="partners-marquee" aria-label="Partner organizations">
+                    <div className="partners-track">
+                        {[...partnerLogos, ...partnerLogos].map((partner, index) => (
+                            <div key={`${partner.name}-${index}`} className="partner-logo-item" aria-hidden={index >= partnerLogos.length}>
+                                <img
+                                    src={partner.logoUrl}
+                                    alt={`${partner.name} logo`}
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer"
+                                    onError={(event) => {
+                                        event.currentTarget.style.display = 'none'
+                                        event.currentTarget.parentElement?.classList.add('logo-fallback')
+                                    }}
+                                />
+                                <span>{partner.name}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
 
-            <section className="card">
-                <div className="card-header">
-                    <h3 style={{ margin: 0 }}>Blog & News</h3>
+            <section className="card success-stories-card">
+                <div className="success-stories-header">
+                    <h3 className="success-stories-title">"Our Success Stories"</h3>
                 </div>
-                <div className="grid grid-3" style={{ marginBottom: 0 }}>
-                    {blogPosts.map((post) => (
-                        <article key={post.title} className="product-card" style={{ marginBottom: 0 }}>
-                            <p className="label" style={{ marginBottom: '0.5rem' }}>{post.date}</p>
-                            <h4 style={{ marginBottom: '0.6rem' }}>{post.title}</h4>
-                            <p style={{ marginBottom: 0 }}>{post.summary}</p>
-                        </article>
-                    ))}
-                </div>
-            </section>
-
-            <section className="card">
-                <div className="card-header">
-                    <h3 style={{ margin: 0 }}>Testimonials</h3>
-                </div>
-                <div className="testimonial-shell">
-                    <blockquote>
-                        "{testimonials[testimonialIndex].quote}"
+                <div className="success-stories-shell">
+                    <blockquote className="success-quote">
+                        <span className="success-quote-mark">“</span>
+                        {testimonials[testimonialIndex].quote}
+                        <span className="success-quote-mark">”</span>
                     </blockquote>
-                    <p>
-                        <strong>{testimonials[testimonialIndex].name}</strong> - {testimonials[testimonialIndex].role}
-                    </p>
+                    <p className="success-quote-author">{testimonials[testimonialIndex].name}</p>
+                    <p className="success-quote-role">{testimonials[testimonialIndex].role}</p>
+                    <div className="testimonial-indicators" aria-label="Select testimonial">
+                        {testimonials.map((item, index) => (
+                            <button
+                                key={item.name}
+                                type="button"
+                                className={`testimonial-indicator ${index === testimonialIndex ? 'active' : ''}`}
+                                onClick={() => setTestimonialIndex(index)}
+                                aria-label={`Show testimonial from ${item.name}`}
+                                aria-pressed={index === testimonialIndex}
+                            >
+                                <img src={item.avatar} alt={item.name} loading="lazy" />
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </section>
         </div>

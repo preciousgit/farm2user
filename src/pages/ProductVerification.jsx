@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-    faBox,
+    faCircleCheck,
     faMagnifyingGlass,
     faLink,
     faSeedling,
@@ -71,7 +71,7 @@ export default function ProductVerification() {
         <div>
             <div className="card" style={{ marginBottom: '2rem' }}>
                 <div className="card-header">
-                    <h2><FontAwesomeIcon icon={faBox} /> Verify Product Authenticity</h2>
+                    <h2><FontAwesomeIcon icon={faCircleCheck}/> Verify Product Authenticity</h2>
                     <p>Use product ID like an order number to verify authenticity, quality, and full distribution history.</p>
                 </div>
 
