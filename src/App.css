@@ -1736,10 +1736,35 @@ select:focus,
 
 .footer-main-grid {
     display: grid;
-    grid-template-columns: 1.5fr repeat(4, 1fr);
-    gap: 1rem;
+    grid-template-columns: 1.65fr 1fr 1fr;
+    grid-template-areas:
+        "brand producers partners"
+        "brand services contact";
+    column-gap: 2.25rem;
+    row-gap: 1.3rem;
     padding-bottom: 1.2rem;
     border-bottom: 1px solid rgba(172, 213, 111, 0.42);
+}
+
+.footer-brand-col {
+    grid-area: brand;
+    padding-right: 1rem;
+}
+
+.footer-producers-col {
+    grid-area: producers;
+}
+
+.footer-partners-col {
+    grid-area: partners;
+}
+
+.footer-services-col {
+    grid-area: services;
+}
+
+.footer-contact-col {
+    grid-area: contact;
 }
 
 .footer-main-grid h4,
@@ -2143,6 +2168,11 @@ select:focus,
 
     .footer-main-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-areas:
+            "brand brand"
+            "producers partners"
+            "services contact";
+        column-gap: 1.4rem;
     }
 
     .crypto-strip {
@@ -2206,6 +2236,13 @@ select:focus,
 
     .footer-main-grid {
         grid-template-columns: 1fr;
+        grid-template-areas:
+            "brand"
+            "producers"
+            "services"
+            "partners"
+            "contact";
+        row-gap: 1rem;
     }
 }
 

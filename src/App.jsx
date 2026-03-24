@@ -335,7 +335,7 @@ function App() {
                         </div>
 
                         <div className="footer-main-grid">
-                            <div>
+                            <div className="footer-brand-col">
                                 <h4>Farm2User</h4>
                                 <p>
                                     Farm2User connects farms, distributors, regulators, and consumers
@@ -357,33 +357,33 @@ function App() {
                                 </div>
                             </div>
 
-                            <div>
+                            <div className="footer-producers-col">
                                 <h5>For Producers</h5>
                                 <p>Register Product</p>
                                 <p>Batch Tracking</p>
                                 <p>Quality Records</p>
                             </div>
 
-                            <div>
+                            <div className="footer-partners-col">
                                 <h5>For Partners</h5>
                                 <p>Become a Partner</p>
                                 <p>Compliance Support</p>
                                 <p>Enterprise Integrations</p>
                             </div>
 
-                            <div>
+                            <div className="footer-services-col">
                                 <h5>Services</h5>
                                 <p>Product Verification</p>
                                 <p>Audit Trail</p>
                                 <p>Analytics Dashboard</p>
                             </div>
 
-                            <div>
-                                <h5>Contact Details</h5>
-                                <p>Main Street 2</p>
-                                <p>Lagos, Nigeria</p>
-                                <p>info@farm2user.io</p>
-                                <p>+234 000 000 0000</p>
+                            <div className="footer-contact-col">
+                                <h5>Contact</h5>
+                                <p>Heritage Tower</p>
+                                <p>E14 3NW</p>
+                                <p>info@farm2user.uk</p>
+                                <p>+44 7823713083</p>
                             </div>
                         </div>
 
